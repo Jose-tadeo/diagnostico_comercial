@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnóstico de Competencias en Ventas</title>
+    <!-- Tailwind CSS para el diseño rápido y responsivo -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js para el gráfico de radar -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Estilos personalizados sutiles */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f3f4f6; }
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .footer-card {
+            box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.05), 0 -2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+
+    <!-- CONTENEDOR PRINCIPAL -->
+    <main class="bg-white rounded-xl shadow-xl w-full max-w-4xl overflow-hidden relative fade-in" id="app-container">
+        
+        <!-- PANTALLA DE INICIO -->
+        <div id="intro-view" class="flex flex-col md:flex-row items-center">
+            <div class="w-full md:w-1/2 h-64 md:h-auto">
+                <!-- Foto inicial: Asesor atendiendo a un cliente -->
+                <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=800&q=80" 
+                     alt="Asesor comercial atendiendo cliente" 
+                     class="w-full h-full object-cover"
+                     onerror="this.src='https://images.unsplash.com/photo-1556761175-5973dc0f32d7?auto=format&fit=crop&w=800&q=80'">
+            </div>
+            <div class="w-full md:w-1/2 p-8 md:p-12 text-center md:text-left">
+                <h1 class="text-3xl font-bold text-gray-800 mb-4">¡Hola! Bienvenido al Diagnóstico de Ventas</h1>
+                <p class="text-gray-600 mb-6 text-lg">
+                    A continuación te plantearemos 22 situaciones cotidianas en el área de ventas.
+                    Responde lo que haces en tu día a día. Es importante que contestes con sinceridad para darte los mejores resultados.
+                </p>
+                <button onclick="startTest()" class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition duration-200 transform hover:scale-105">
+                    Empezar
+                </button>
+            </div>
+        </div>
+
+        <!-- PANTALLA DE PREGUNTAS -->
+        <div id="question-view" class="hidden p-8 md:p-12 fade-in">
+            <div class="mb-6 flex justify-between items-center border-b pb-4">
+                <h2 class="text-xl font-bold text-gray-800">Cuestionario</h2>
+                <span id="progress-text" class="text-sm font-semibold bg-blue-100 text-blue-800 py-1 px-3 rounded-full">Pregunta 1 de 22</span>
+            </div>
+            
+            <div class="mb-8">
+                <h3 id="question-text" class="text-xl md:text-2xl text-gray-700 font-medium leading-relaxed">
+                    <!-- Pregunta inyectada por JS -->
+                </h3>
+            </div>
+
+            <div class="flex flex-col gap-4" id="options-container">
+                <!-- Botones inyectados por JS -->
+            </div>
+        </div>
+
+        <!-- PANTALLA DE RESULTADOS -->
+        <div id="results-view" class="hidden p-8 md:p-12 fade-in">
+            <div class="flex flex-col items-center max-w-3xl mx-auto md:text-left">
+                <h2 class="text-3xl font-bold text-gray-800 mb-2 border-b pb-2 w-full">Tu Perfil Comercial</h2>
+                
+                <div class="mt-4 mb-6 w-full text-center md:text-left">
+                    <h3 class="text-2xl font-bold text-blue-600" id="profile-title">Perfil</h3>
+                    <p class="text-gray-600 mt-2 text-lg italic" id="profile-desc">Descripción del perfil</p>
+                </div>
+
+                <div class="w-full max-w-md mx-auto mb-8 relative">
+                    <canvas id="radarChart"></canvas>
+                </div>
+
+                <div class="bg-blue-50 p-6 rounded-lg border border-blue-100 w-full text-left">
+                    <h4 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                        <svg class="w-6 h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        Plan de Mejora Sugerido
+                    </h4>
+                    <ul id="action-plan" class="list-disc pl-5 space-y-2 text-gray-700">
+                        <!-- Acciones inyectadas por JS -->
+                    </ul>
+                </div>
+                
+                <button onclick="location.reload()" class="mt-8 w-full md:w-auto bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-8 rounded-lg transition duration-200 self-center md:self-start">
+                    Volver a tomar el test
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FOOTER ESTÁNDAR ABAJO DEL CONTENEDOR (NO FLOTANTE) -->
+    <footer class="mt-8 text-center text-sm text-gray-700 w-full max-w-4xl">
+        <p class="font-bold text-gray-900 text-base">Desarrollado por Jose Fernando Espinosa Marsiglia.</p>
+        <p>Experto en capacitación empresarial</p>
+        <p class="font-medium text-blue-600">Contáctame al 3147012459</p>
+    </footer>
+
+    <script>
+        // --- BASE DE DATOS TRADUCIDA DEL SCRIPT ORIGINAL ---
+        const preguntas = [
+            {d: "Preparación", p: "1. Antes de iniciar la jornada, tú:", o: {"A": 3, "B": 2, "C": 1}, t: ["Revisas producto, competencia y condiciones comerciales", "Coordinas la organización del punto de venta", "Te enfocas en iniciar la atención al cliente lo antes posible para incremetar la productividad"], m: "Al inicio de cada jornada, verifica precios, existencias y condiciones comerciales."},
+            {d: "Preparación", p: "2. Con respecto al inventario de vehículos, usualmente tu:", o: {"A": 1, "B": 2, "C": 3}, t: ["Verificas la información solo si el cliente pregunta", "Tienes una idea general del inventario disponible", "Validas inventario, versiones y precios al menos dos veces por semana"], m: "Realiza un chequeo diario de versiones y disponibilidad antes de recibir al primer cliente."},
+            {d: "Preparación", p: "3. Sobre el mercado automotriz y tus competidores, por lo general tu:", o: {"A": 2, "B": 3, "C": 1}, t: ["Conoces la información básica", "Te actualizas semanalmente con perfiles especializados en las redes sociales", "Revisas la información proporcionada por el concesionario o la marca"], m: "Dedica 15 minutos semanales a investigar lanzamientos y fichas de la competencia."},
+            {d: "Apertura", p: "4. Cuando un cliente ingresa al punto de venta, por lo general tu:", o: {"A": 1, "B": 2, "C": 3}, t: ["Esperas a que el cliente se acerque a ti", "Te diriges al cliente, lo saludas y esperas su reacción", "Tienes un saludo estructurado y que induce al cierre desde el inicio de la venta"], m: "Aplica un protocolo de saludo proactivo para romper el hielo de inmediato."},
+            {d: "Apertura", p: "5. Tu apertura de ventas suele:", o: {"A": 3, "B": 2, "C": 1}, t: ["Incluir una pregunta de inducción", "Incluir una bienvenida y presentación", "Finalizar con un ¿En qué le puedo colaborar?"], m: "Cambia tu cierre de apertura por una pregunta de inducción que genere conversación."},
+            {d: "Apertura", p: "6. Si el cliente pregunta el precio de un vehículo al inicio de la venta, la mejor estrategia es:", o: {"A": 1, "B": 3, "C": 2}, t: ["Dar el precio de la versión tope de gama y ofrecer un descuento de inmediato", "Hacer algunas preguntas antes de mencionar el precio", "Dar el precio inmediatamente"], m: "Antes de hablar de precios, indaga las necesidades para defender el valor del producto."},
+            {d: "Indagación", p: "7. Durante la conversación con el cliente, por lo general tu:", o: {"A": 3, "B": 2, "C": 1}, t: ["Realizas al menos 8 preguntas", "Haces 5 preguntas o menos", "Haces menos de 5 preguntas y te enfocas en mostrar el vehículo"], m: "Practica la escucha activa; busca realizar al menos 8 preguntas clave durante la entrevista."},
+            {d: "Indagación", p: "8. Sobre el uso que el cliente le dará al vehículo consideras que:", o: {"A": 1, "B": 3, "C": 2}, t: ["Lo mejor es no hacer mayor profundización para no incomodar al cliente", "Hacer preguntas para profundizar en necesidades y expectativas", "indagar de forma general"], m: "Indaga el contexto de uso (familia, trabajo, viajes) para personalizar tu recomendación."},
+            {d: "Indagación", p: "9. Sobre la capacidad de compra del cliente, lo mejor es:", o: {"A": 1, "B": 2, "C": 3}, t: ["No explorarla en absoluto para no incomodarlo", "Hacer preguntas directas y establecer con claridad quién y cuándo toma la decisión de compra,", "Hacer preguntas indirectas, pero que proporcionen pistas sobre el perfil del cliente"], m: "Utiliza preguntas indirectas para identificar el presupuesto y método de pago ideal."},
+            {d: "Indagación", p: "10. Con respecto a las expectativas del cliente lo mejor es:", o: {"A": 3, "B": 2, "C": 1}, t: ["Indagar sus motivaciones y prioridades", "Tener un cuestionario básico preparado y usarlo siempre para hacelerar la atención.", "No preguntar sobre este aspecto. Es parte de la vida privada del cliente"], m: "Pregunta siempre qué es lo que más valora el cliente en su próximo vehículo."},
+            {d: "Técnico", p: "11. Si te preguntan sobre vehículos híbridos, tu capacidad para dar una explicación convincente actualmente es:", o: {"A": 1, "B": 2, "C": 3}, t: ["Baja: sabes que debes aprender y por eso das respuestas breves", "Fuerte: Conoces este tipo de productos y puedes brindar información técnica", "Empática: puedes traducir los aspectos técnicos a un lenguaje fácil de entender para el cliente"], m: "Capacítate en tecnologías híbridas para explicar conceptos complejos de forma sencilla."},
+            {d: "Técnico", p: "12. Al explicar características técnicas de tu vehículo es usual que:", o: {"A": 1, "B": 3, "C": 2}, t: ["Sientas inseguridad y prefieras no entrar en detalles", "Seas capaz de traducirlas a beneficios relacionados con lo manifestado por el cliente", "Puedas explicarlas con una pericia técnica digna de un ingeniero experto."], m: "Estudia la ficha técnica y traduce cada componente en un beneficio real para el usuario."},
+            {d: "Técnico", p: "13. Al presentar un vehículo, es usual que:", o: {"A": 1, "B": 3, "C": 2}, t: ["Debas improvisar durante la exposición", "Puedas ajustar y adaptar el discurso a las expectactivas del cliente", "Uses el mismo discurso para la mayoría de tus clientes"], m: "Estructura un recorrido del vehículo (Walk Around) adaptado a lo que el cliente busca."},
+            {d: "Presentación", p: "14. Al presentar el vehículo desde una perspectiva técnica, por lo general tu:", o: {"A": 1, "B": 2, "C": 3}, t: ["Mencionas aspectos generales", "Explicas siglas y tecnicismos con facilidad", "Relacionas técnica con necesidades"], m: "Conecta las siglas y tecnicismos con la solución a las necesidades del cliente."},
+            {d: "Presentación", p: "15. Tu comunicación durante la venta es principalmente:", o: {"A": 1, "B": 2, "C": 3}, t: ["Orientada a precio y descuentos", "Orientada a aspectos técnicos", "Orientada a ventajas y beneficios"], m: "Enfoca tu discurso en las ventajas competitivas y el valor de la marca, no solo en el costo."},
+            {d: "Objeciones", p: "16. Si el cliente manifiesta que el vehículo está muy caro, la mejor estrategia es:", o: {"A": 3, "B": 2, "C": 1}, t: ["Indagar cuál es la razón para que el cliente tenga esa perceción", "Justificar el valor del vehículo mencionando sus ventajas", "Ofreces un descuento rápidamente para no perder la venta"], m: "Cuando el cliente diga 'está caro', indaga el motivo antes de ceder en el margen."},
+            {d: "Objeciones", p: "17. Si el cliente compara tu vehículo con competidor, por lo general tu:", o: {"A": 1, "B": 3, "C": 2}, t: ["Demuestras que tu producto es mejor, mostrando sus bondades y las desventajas del otro", "Contrastas las fichas técnicas de los dos vehículos para encontrar fortalezas", "Centras tu estrategia para mostrar el valor, el prestigio y el respaldo de marca"], m: "Usa comparativos técnicos objetivos para resaltar tus fortalezas sin atacar a la competencia."},
+            {d: "Objeciones", p: "18. Si el cliente manifiesta dudas u objeciones, la mejor estrategia es:", o: {"A": 1, "B": 2, "C": 3}, t: ["Negociar descuento y cerrar rápidamente", "Refutar la objeción usando contra argumentos técnicos", "Profundizar en la objeción y entender cuál es el orígen de la misma"], m: "Profundiza en las dudas del cliente para resolver la objeción de raíz antes de negociar."},
+            {d: "Cierre", p: "19. Al final de la presentación de la venta, la mejor estrategia es:", o: {"A": 1, "B": 2, "C": 3}, t: ["Adoptar un enfoque conservador y esperar a que el cliente decida", "Cerrar únicamente en los casos en los que tienes la seguridad de que el negocio es un hecho", "Conducir la venta y pedir el cierre por primera vez una vez se ha presentado el vehículo"], m: "Toma el liderazgo al final de la charla y pide el cierre de forma profesional."},
+            {d: "Presentación", p: "20. Si durante la presentación del producto detectas interés de compra, lo mejor es:", o: {"A": 3, "B": 2, "C": 1}, t: ["Proponer el siguiente paso y llevar el cliente al cierre", "Continuar explicando el vehículo para incrementar la convicción del cliente", "Tomar los datos del cliente y esperar a que pregunte qué pasos debe dar para comprar el vehículo"], m: "Si detectas interés, propón tú el siguiente paso (test drive, reserva o crédito)."},
+            {d: "Cierre", p: "21. Si duda en cerrar el negocio, la mejor alternativa es:", o: {"A": 1, "B": 3, "C": 2}, t: ["Esperar y darle tiempo", "Intentar un pre-cierre", "Dar más información para convencerlo"], m: "Ante la indecisión, utiliza técnicas de pre-cierre para identificar qué falta para el 'sí'."},
+            {d: "Cierre", p: "22. Al finalizar la presentación del vehículo, por lo general tu:", o: {"A": 1, "B": 2, "C": 3}, t: ["Tomas los datos del cliente y expides una cotización", "Registras los datos del cliente en tu CRM y lo contactas al día siguiente", "Propones un cierre y defines los pasos siguientes, como por ejemplo un test drive"], m: "No te limites a cotizar; establece un compromiso claro de seguimiento o cierre."}
+        ];
+
+        const perfiles_desc = {
+            "Arquitecto de la venta": "Asesor estratégico que domina la indagación y el cierre. Estructura cada etapa del proceso con técnica, resolviendo necesidades reales y liderando el camino hacia una decisión de valor.",
+            "Bulldozer del cierre": "Perfil enfocado intensamente en el resultado final. Su urgencia por cerrar puede descuidar el diagnóstico del cliente, confiando más en la presión que en la solución de necesidades específicas.",
+            "Doctor de la ficha técnica": "Experto en el producto con alta solvencia técnica. Su enfoque es informativo y detallado, pero suele tener dificultades para concretar el cierre al priorizar los datos sobre la persuasión.",
+            "Mago del descuento": "Estratega centrado en el precio como principal argumento de venta. Ante objeciones, recurre rápidamente a concesiones comerciales en lugar de defender el valor y los beneficios del producto.",
+            "Copiloto turista": "Acompaña al cliente de forma reactiva durante el proceso. Carece de liderazgo comercial, permitiendo que el comprador dicte el ritmo sin intervenir para orientar la venta hacia el cierre."
+        };
+
+        // --- ESTADO DE LA APLICACIÓN ---
+        let currentIndex = 0;
+        let respuestasValores = [];
+
+        // --- LÓGICA DE INTERFAZ ---
+        function startTest() {
+            document.getElementById('intro-view').classList.add('hidden');
+            document.getElementById('question-view').classList.remove('hidden');
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            if (currentIndex < preguntas.length) {
+                const item = preguntas[currentIndex];
+                
+                // Actualizar progreso y texto
+                document.getElementById('progress-text').innerText = `Pregunta ${currentIndex + 1} de ${preguntas.length}`;
+                document.getElementById('question-text').innerText = item.p;
+                
+                // Limpiar y crear opciones
+                const container = document.getElementById('options-container');
+                container.innerHTML = '';
+                
+                const letras = ['A', 'B', 'C'];
+                letras.forEach((letra, index) => {
+                    const btn = document.createElement('button');
+                    // Estilos de los botones A, B, C
+                    btn.className = "text-left w-full p-4 md:p-5 border-2 border-gray-200 rounded-xl hover:bg-blue-50 hover:border-blue-300 transition duration-150 flex items-start group shadow-sm";
+                    btn.onclick = () => registrarRespuesta(letra);
+                    
+                    const labelSpan = document.createElement('span');
+                    labelSpan.className = "font-extrabold text-blue-600 mr-4 text-lg bg-blue-100 rounded-lg w-8 h-8 flex items-center justify-center shrink-0 group-hover:bg-blue-200";
+                    labelSpan.innerText = letra;
+
+                    const textSpan = document.createElement('span');
+                    textSpan.className = "text-gray-700 text-base md:text-lg pt-1";
+                    textSpan.innerText = item.t[index];
+
+                    btn.appendChild(labelSpan);
+                    btn.appendChild(textSpan);
+                    container.appendChild(btn);
+                });
+            } else {
+                mostrarResultados();
+            }
+        }
+
+        function registrarRespuesta(letra) {
+            // Guardar el valor de la opción elegida (1, 2 o 3)
+            const valor = preguntas[currentIndex].o[letra];
+            respuestasValores.push(valor);
+            
+            currentIndex++;
+            
+            // Pequeña animación de transición
+            const qView = document.getElementById('question-view');
+            qView.classList.remove('fade-in');
+            void qView.offsetWidth; // trigger reflow
+            qView.classList.add('fade-in');
+            
+            renderQuestion();
+        }
+
+        function mostrarResultados() {
+            document.getElementById('question-view').classList.add('hidden');
+            document.getElementById('results-view').classList.remove('hidden');
+
+            const r = respuestasValores;
+            
+            // Cálculos exactamente iguales al script de Python original
+            const sum = (arr) => arr.reduce((a,b) => a + b, 0);
+            
+            const dims_puntos = {
+                "Preparación": sum(r.slice(0, 3)),
+                "Apertura": sum(r.slice(3, 6)),
+                "Indagación": sum(r.slice(6, 10)),
+                "Técnico": sum(r.slice(10, 13)),
+                "Presentación": r[13] + r[14] + r[19],
+                "Objeciones": sum(r.slice(15, 18)),
+                "Cierre": r[18] + r[20] + r[21]
+            };
+
+            const maxs = [9, 9, 12, 9, 9, 9, 9];
+            const scores = Object.values(dims_puntos).map((val, idx) => (val / maxs[idx]) * 10);
+            const labels = Object.keys(dims_puntos);
+
+            // Determinar Perfil
+            let perfil = "";
+            let dim_critica = "";
+
+            if (scores[2] >= 8 && scores[6] >= 8) {
+                perfil = "Arquitecto de la venta";
+                dim_critica = "";
+            } else if (scores[6] >= 8) {
+                perfil = "Bulldozer del cierre";
+                dim_critica = "Indagación";
+            } else if (scores[3] >= 8) {
+                perfil = "Doctor de la ficha técnica";
+                dim_critica = "Cierre";
+            } else if (r[15] === 1 || r[16] === 1 || r[17] === 1) { // Índices de objeciones
+                perfil = "Mago del descuento";
+                dim_critica = "Objeciones";
+            } else {
+                perfil = "Copiloto turista";
+                dim_critica = "Apertura";
+            }
+
+            // Actualizar textos en la UI
+            document.getElementById('profile-title').innerText = perfil;
+            document.getElementById('profile-desc').innerText = perfiles_desc[perfil];
+
+            // Generar Plan de Mejora
+            let vinculadas = [];
+            let otras = [];
+
+            r.forEach((val, i) => {
+                if (val === 1) {
+                    const acc = preguntas[i].m;
+                    if (preguntas[i].d === dim_critica) {
+                        vinculadas.push(acc);
+                    } else {
+                        otras.push(acc);
+                    }
+                }
+            });
+
+            const plan = [...vinculadas, ...otras].slice(0, 4);
+            const actionPlanContainer = document.getElementById('action-plan');
+            actionPlanContainer.innerHTML = '';
+            
+            if (plan.length > 0) {
+                plan.forEach(acc => {
+                    const li = document.createElement('li');
+                    li.innerText = acc;
+                    actionPlanContainer.appendChild(li);
+                });
+            } else {
+                const li = document.createElement('li');
+                li.innerText = "¡Excelente trabajo! No se registran debilidades críticas en tu proceso de ventas.";
+                li.className = "text-green-600 font-medium";
+                actionPlanContainer.appendChild(li);
+            }
+
+            // Dibujar Gráfico de Radar
+            dibujarGrafico(labels, scores);
+        }
+
+        let radarChartInstance = null;
+
+        function dibujarGrafico(labels, scores) {
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            
+            if(radarChartInstance) {
+                radarChartInstance.destroy();
+            }
+
+            radarChartInstance = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Tus Competencias',
+                        data: scores,
+                        backgroundColor: 'rgba(37, 99, 235, 0.3)', // Color Azul de Tailwind
+                        borderColor: 'rgba(37, 99, 235, 1)',
+                        pointBackgroundColor: 'rgba(37, 99, 235, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(37, 99, 235, 1)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        r: {
+                            angleLines: { color: 'rgba(0, 0, 0, 0.1)' },
+                            grid: { color: 'rgba(0, 0, 0, 0.1)' },
+                            pointLabels: {
+                                font: { size: 12, family: "'Segoe UI', sans-serif", weight: 'bold' },
+                                color: '#4b5563'
+                            },
+                            ticks: {
+                                min: 0,
+                                max: 10,
+                                stepSize: 2,
+                                backdropColor: 'transparent',
+                                color: '#9ca3af'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `Puntuación: ${context.parsed.r.toFixed(1)} / 10`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
